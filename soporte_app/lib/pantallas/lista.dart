@@ -19,9 +19,9 @@ class PantallaLista extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Mis solicitudes'),
         actions: [
-          IconButton(
+          TextButton.icon(
             icon: const Icon(Icons.map),
-            tooltip: 'Mapa de atenciones',
+            label: const Text('Mapa'),
             onPressed: () {
               Navigator.push(context, MaterialPageRoute(builder: (_) => const PantallaMapa()));
             },
