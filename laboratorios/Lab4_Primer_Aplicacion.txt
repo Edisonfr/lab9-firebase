@@ -1,0 +1,68 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MiPrimeraApp());
+}
+
+class MiPrimeraApp extends StatelessWidget {
+  const MiPrimeraApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Mi primera app',
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: const PantallaPrincipal(),
+    );
+  }
+}
+
+class PantallaPrincipal extends StatefulWidget {
+  const PantallaPrincipal({super.key});
+
+  @override
+  State<PantallaPrincipal> createState() => _PantallaPrincipalState();
+}
+
+class _PantallaPrincipalState extends State<PantallaPrincipal> {
+  int contador = 0;
+  String nombre = 'Edison';
+
+  void incrementar() {
+    setState(() {
+      contador++;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Flutter AFD-200 - Lab 4'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Hola, $nombre 👋',
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 20),
+            const Text('Has presionado el botón:'),
+            Text(
+              '$contador veces',
+              style: const TextStyle(fontSize: 32, color: Colors.blue),
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: incrementar,
+        tooltip: 'Incrementar',
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+}

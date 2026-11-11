@@ -1,0 +1,119 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MenuApp());
+}
+
+class MenuApp extends StatelessWidget {
+  const MenuApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Menú del Restaurante',
+      theme: ThemeData(primarySwatch: Colors.deepOrange),
+      home: const PantallaMenu(),
+    );
+  }
+}
+
+class Plato {
+  final String nombre;
+  final String descripcion;
+  final double precio;
+  final IconData icono;
+  final String categoria;
+
+  Plato(this.nombre, this.descripcion, this.precio, this.icono, this.categoria);
+}
+
+class PantallaMenu extends StatefulWidget {
+  const PantallaMenu({super.key});
+
+  @override
+  State<PantallaMenu> createState() => _PantallaMenuState();
+}
+
+class _PantallaMenuState extends State<PantallaMenu> {
+  final List<Plato> platos = [
+    Plato('Bandeja Paisa', 'Frijoles, arroz, carne, chicharrón, arepa', 32000, Icons.restaurant, 'Fuertes'),
+    Plato('Ajiaco Santafereño', 'Pollo, papa criolla, mazorca, crema', 26000, Icons.soup_kitchen, 'Fuertes'),
+    Plato('Limonada de Coco', 'Limonada natural con coco', 9000, Icons.local_drink, 'Bebidas'),
+    Plato('Jugo de Mora', 'Jugo natural de mora en leche o agua', 8000, Icons.local_drink, 'Bebidas'),
+    Plato('Postre de Natas', 'Postre tradicional casero', 10000, Icons.cake, 'Postres'),
+  ];
+
+  // Lo que el usuario lleva seleccionado (carrito simple)
+  final List<Plato> carrito = [];
+
+  void agregarAlCarrito(Plato plato) {
+    setState(() {
+      carrito.add(plato);
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('${plato.nombre} agregado al pedido')),
+    );
+  }
+
+  double get totalCarrito =>
+      carrito.fold(0, (suma, plato) => suma + plato.precio);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Menú del Restaurante'),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Row(
+              children: [
+                const Icon(Icons.shopping_cart),
+                const SizedBox(width: 4),
+                Text('${carrito.length}'),
+              ],
+            ),
+          ),
+        ],
+      ),
+      body: ListView.builder(
+        itemCount: platos.length,
+        itemBuilder: (context, index) {
+          final plato = platos[index];
+          return Card(
+            margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            elevation: 3,
+            child: ListTile(
+              leading: CircleAvatar(
+                backgroundColor: Colors.deepOrange.shade100,
+                child: Icon(plato.icono, color: Colors.deepOrange),
+              ),
+              title: Text(plato.nombre, style: const TextStyle(fontWeight: FontWeight.bold)),
+              subtitle: Text('${plato.categoria} • ${plato.descripcion}'),
+              trailing: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('\$${plato.precio.toStringAsFixed(0)}'),
+                  IconButton(
+                    icon: const Icon(Icons.add_circle, color: Colors.deepOrange),
+                    onPressed: () => agregarAlCarrito(plato),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+      bottomNavigationBar: BottomAppBar(
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Text(
+            'Total del pedido: \$${totalCarrito.toStringAsFixed(0)}',
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+        ),
+      ),
+    );
+  }
+}

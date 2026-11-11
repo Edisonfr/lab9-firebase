@@ -1,0 +1,145 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const TiendaPizzaApp());
+}
+
+class TiendaPizzaApp extends StatelessWidget {
+  const TiendaPizzaApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Tienda de Pizza',
+      theme: ThemeData(primarySwatch: Colors.red),
+      home: const PantallaCatalogo(),
+    );
+  }
+}
+
+class Pizza {
+  final String nombre;
+  final String ingredientes;
+  final double precio;
+  final IconData icono;
+
+  Pizza(this.nombre, this.ingredientes, this.precio, this.icono);
+}
+
+final List<Pizza> catalogo = [
+  Pizza('Margarita', 'Tomate, mozzarella, albahaca', 25000, Icons.local_pizza),
+  Pizza('Pepperoni', 'Tomate, mozzarella, pepperoni', 30000, Icons.local_pizza),
+  Pizza('Hawaiana', 'Tomate, mozzarella, jamón, piña', 32000, Icons.local_pizza),
+  Pizza('Vegetariana', 'Tomate, mozzarella, vegetales frescos', 28000, Icons.local_pizza),
+];
+
+// ---------- PANTALLA 1: Catálogo ----------
+class PantallaCatalogo extends StatefulWidget {
+  const PantallaCatalogo({super.key});
+
+  @override
+  State<PantallaCatalogo> createState() => _PantallaCatalogoState();
+}
+
+class _PantallaCatalogoState extends State<PantallaCatalogo> {
+  int pedidosRealizados = 0;
+
+  // Navega a la pantalla de detalle y ESPERA una respuesta (la pizza confirmada)
+  Future<void> irADetalle(Pizza pizza) async {
+    final resultado = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PantallaDetalle(pizza: pizza),
+      ),
+    );
+
+    // Si el usuario confirmó el pedido, 'resultado' trae la pizza de vuelta
+    if (resultado != null && resultado is Pizza) {
+      setState(() {
+        pedidosRealizados++;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Pedido confirmado: ${resultado.nombre} 🍕')),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Catálogo de Pizzas'),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(14.0),
+            child: Text('Pedidos: $pedidosRealizados'),
+          ),
+        ],
+      ),
+      body: ListView.builder(
+        itemCount: catalogo.length,
+        itemBuilder: (context, index) {
+          final pizza = catalogo[index];
+          return ListTile(
+            leading: Icon(pizza.icono, color: Colors.red, size: 32),
+            title: Text(pizza.nombre, style: const TextStyle(fontWeight: FontWeight.bold)),
+            subtitle: Text(pizza.ingredientes),
+            trailing: Text('\$${pizza.precio.toStringAsFixed(0)}'),
+            onTap: () => irADetalle(pizza), // 👈 aquí ocurre la navegación
+          );
+        },
+      ),
+    );
+  }
+}
+
+// ---------- PANTALLA 2: Detalle ----------
+class PantallaDetalle extends StatelessWidget {
+  final Pizza pizza; // dato recibido desde la pantalla anterior
+
+  const PantallaDetalle({super.key, required this.pizza});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text(pizza.nombre)),
+      body: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(pizza.icono, size: 100, color: Colors.red),
+            const SizedBox(height: 16),
+            Text(pizza.nombre, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            Text('Ingredientes: ${pizza.ingredientes}', style: const TextStyle(fontSize: 16)),
+            const SizedBox(height: 8),
+            Text('Precio: \$${pizza.precio.toStringAsFixed(0)}',
+                style: const TextStyle(fontSize: 20, color: Colors.red)),
+            const Spacer(),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  // Devuelve la pizza a la pantalla anterior (PantallaCatalogo)
+                  Navigator.pop(context, pizza);
+                },
+                style: ElevatedButton.styleFrom(padding: const EdgeInsets.all(16)),
+                child: const Text('Confirmar pedido', style: TextStyle(fontSize: 18)),
+              ),
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton(
+                onPressed: () => Navigator.pop(context), // vuelve sin confirmar nada
+                child: const Text('Volver'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

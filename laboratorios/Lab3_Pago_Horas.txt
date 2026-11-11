@@ -1,0 +1,49 @@
+// Clase base: Empleado
+class Empleado {
+  String nombre;
+  double salarioBase;
+  double horasExtra;
+
+  Empleado(this.nombre, this.salarioBase, this.horasExtra);
+
+  // Getter: calcula el valor de la hora ordinaria
+  double get valorHora => salarioBase / 240; // asumiendo 240 horas/mes
+
+  // Método que puede ser sobrescrito por las subclases
+  double calcularPago() {
+    double pagoHorasExtra = horasExtra * valorHora * 1.25; // recargo del 25%
+    return salarioBase + pagoHorasExtra;
+  }
+
+  void mostrarResumen() {
+    print('--- $nombre ---');
+    print('Salario base: \$${salarioBase.toStringAsFixed(0)}');
+    print('Horas extra: $horasExtra');
+    print('Pago total: \$${calcularPago().toStringAsFixed(0)}');
+  }
+}
+
+// Clase derivada: EmpleadoNocturno (hereda de Empleado)
+class EmpleadoNocturno extends Empleado {
+  EmpleadoNocturno(String nombre, double salarioBase, double horasExtra)
+      : super(nombre, salarioBase, horasExtra);
+
+  // Sobrescribimos el cálculo: el recargo nocturno es del 35%, no del 25%
+  @override
+  double calcularPago() {
+    double pagoHorasExtra = horasExtra * valorHora * 1.35;
+    return salarioBase + pagoHorasExtra;
+  }
+}
+
+void main() {
+  Empleado edison = Empleado('Edison', 2200000, 8);
+  EmpleadoNocturno maria = EmpleadoNocturno('María', 2200000, 8);
+
+  edison.mostrarResumen();
+  print('');
+  maria.mostrarResumen();
+
+  print('\nDiferencia de pago por el recargo nocturno: '
+      '\$${(maria.calcularPago() - edison.calcularPago()).toStringAsFixed(0)}');
+}

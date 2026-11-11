@@ -1,0 +1,37 @@
+void main() {
+  // Menú disponible
+  List<String> menu = ['Margarita', 'Pepperoni', 'Hawaiana', 'Vegetariana'];
+  List<double> precios = [25000, 30000, 32000, 28000];
+
+  print('=== Pedido de Pizza ===');
+  for (int i = 0; i < menu.length; i++) {
+    print('${i + 1}. ${menu[i]} - \$${precios[i].toStringAsFixed(0)}');
+  }
+
+  // Simulamos el pedido del cliente 
+  // así que fijamos la elección en una variable)
+  int opcion = 3; // número para probar otra pizza
+  int cantidad = 5;
+
+  if (opcion < 1 || opcion > menu.length) {
+    print('Opción inválida');
+  } else {
+    String pizzaElegida = menu[opcion - 1];
+    double precioUnitario = precios[opcion - 1];
+    double subtotal = precioUnitario * cantidad;
+
+    double descuento = 0;
+    if (cantidad >= 3) {
+      descuento = subtotal * 0.10; // 10% de descuento desde 3 unidades
+    }
+
+    double total = subtotal - descuento;
+
+    print('\n--- Resumen del pedido ---');
+    print('Pizza: $pizzaElegida');
+    print('Cantidad: $cantidad');
+    print('Subtotal: \$${subtotal.toStringAsFixed(0)}');
+    print('Descuento: \$${descuento.toStringAsFixed(0)}');
+    print('Total a pagar: \$${total.toStringAsFixed(0)}');
+  }
+}

@@ -1,0 +1,139 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const TablaYStackApp());
+}
+
+class TablaYStackApp extends StatelessWidget {
+  const TablaYStackApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Lab 7B - DataTable y Stack',
+      theme: ThemeData(primarySwatch: Colors.indigo),
+      home: const PantallaCalificaciones(),
+    );
+  }
+}
+
+class Estudiante {
+  final String nombre;
+  final double nota1;
+  final double nota2;
+  final double nota3;
+
+  Estudiante(this.nombre, this.nota1, this.nota2, this.nota3);
+
+  double get promedio => (nota1 + nota2 + nota3) / 3;
+  bool get aprobado => promedio >= 3.0;
+}
+
+class PantallaCalificaciones extends StatefulWidget {
+  const PantallaCalificaciones({super.key});
+
+  @override
+  State<PantallaCalificaciones> createState() => _PantallaCalificacionesState();
+}
+
+class _PantallaCalificacionesState extends State<PantallaCalificaciones> {
+  final List<Estudiante> estudiantes = [
+    Estudiante('Edison Forero', 4.2, 3.8, 4.5),
+    Estudiante('Laura Gómez', 2.5, 3.0, 2.8),
+    Estudiante('Camilo Ruiz', 3.6, 3.9, 3.2),
+    Estudiante('Valentina Díaz', 4.8, 4.9, 5.0),
+  ];
+
+  // Para marcar visualmente la fila seleccionada
+  int? filaSeleccionada;
+
+  @override
+  Widget build(BuildContext context) {
+    final aprobados = estudiantes.where((e) => e.aprobado).length;
+
+    return Scaffold(
+      appBar: AppBar(title: const Text('Calificaciones del curso')),
+      body: Column(
+        children: [
+          // ---------- STACK: insignia superpuesta sobre un ícono ----------
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                const CircleAvatar(
+                  radius: 40,
+                  backgroundColor: Colors.indigo,
+                  child: Icon(Icons.school, size: 40, color: Colors.white),
+                ),
+                // El Positioned "superpone" este widget sobre el anterior
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  child: Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: const BoxDecoration(
+                      color: Colors.red,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Text(
+                      '$aprobados',
+                      style: const TextStyle(color: Colors.white, fontSize: 12),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Text('Estudiantes aprobados', style: TextStyle(fontSize: 14, color: Colors.grey)),
+          const SizedBox(height: 16),
+
+          // ---------- DATATABLE ----------
+          Expanded(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: SingleChildScrollView(
+                child: DataTable(
+                  columns: const [
+                    DataColumn(label: Text('Estudiante')),
+                    DataColumn(label: Text('Nota 1'), numeric: true),
+                    DataColumn(label: Text('Nota 2'), numeric: true),
+                    DataColumn(label: Text('Nota 3'), numeric: true),
+                    DataColumn(label: Text('Promedio'), numeric: true),
+                    DataColumn(label: Text('Estado')),
+                  ],
+                  rows: List<DataRow>.generate(estudiantes.length, (index) {
+                    final e = estudiantes[index];
+                    return DataRow(
+                      selected: filaSeleccionada == index,
+                      onSelectChanged: (seleccionado) {
+                        setState(() {
+                          filaSeleccionada = (seleccionado ?? false) ? index : null;
+                        });
+                      },
+                      cells: [
+                        DataCell(SelectableText(e.nombre)), // texto que se puede copiar
+                        DataCell(Text(e.nota1.toStringAsFixed(1))),
+                        DataCell(Text(e.nota2.toStringAsFixed(1))),
+                        DataCell(Text(e.nota3.toStringAsFixed(1))),
+                        DataCell(Text(
+                          e.promedio.toStringAsFixed(2),
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: e.aprobado ? Colors.green : Colors.red,
+                          ),
+                        )),
+                        DataCell(Text(e.aprobado ? 'Aprobado' : 'Reprobado')),
+                      ],
+                    );
+                  }),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

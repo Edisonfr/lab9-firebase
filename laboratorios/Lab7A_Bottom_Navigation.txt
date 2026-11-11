@@ -1,0 +1,143 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const AppNavegacion());
+}
+
+class AppNavegacion extends StatelessWidget {
+  const AppNavegacion({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Navegación - Lab 7A',
+      theme: ThemeData(primarySwatch: Colors.teal),
+      home: const PantallaPrincipal(),
+    );
+  }
+}
+
+class PantallaPrincipal extends StatefulWidget {
+  const PantallaPrincipal({super.key});
+
+  @override
+  State<PantallaPrincipal> createState() => _PantallaPrincipalState();
+}
+
+class _PantallaPrincipalState extends State<PantallaPrincipal> {
+  int indiceActual = 0;
+
+  // Una pantalla por cada ítem del BottomNavigationBar
+  final List<Widget> pantallas = const [
+    SeccionInicio(),
+    SeccionCursos(), // esta trae el TabBar adentro
+    SeccionPerfil(),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('App Flutter AFD-200')),
+      body: pantallas[indiceActual],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: indiceActual,
+        selectedItemColor: Colors.teal,
+        unselectedItemColor: Colors.grey,
+        onTap: (nuevoIndice) {
+          setState(() {
+            indiceActual = nuevoIndice;
+          });
+        },
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
+          BottomNavigationBarItem(icon: Icon(Icons.menu_book), label: 'Cursos'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------- Sección 1: Inicio ----------
+class SeccionInicio extends StatelessWidget {
+  const SeccionInicio({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: Text('Bienvenido 👋', style: TextStyle(fontSize: 24)),
+    );
+  }
+}
+
+// ---------- Sección 2: Cursos (con TabBar adentro) ----------
+class SeccionCursos extends StatefulWidget {
+  const SeccionCursos({super.key});
+
+  @override
+  State<SeccionCursos> createState() => _SeccionCursosState();
+}
+
+class _SeccionCursosState extends State<SeccionCursos>
+    with SingleTickerProviderStateMixin {
+  late TabController controladorTabs;
+
+  @override
+  void initState() {
+    super.initState();
+    controladorTabs = TabController(length: 3, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    controladorTabs.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        TabBar(
+          controller: controladorTabs,
+          labelColor: Colors.teal,
+          tabs: const [
+            Tab(icon: Icon(Icons.play_circle), text: 'En curso'),
+            Tab(icon: Icon(Icons.check_circle), text: 'Completados'),
+            Tab(icon: Icon(Icons.bookmark), text: 'Guardados'),
+          ],
+        ),
+        Expanded(
+          child: TabBarView(
+            controller: controladorTabs,
+            children: const [
+              Center(child: Text('Flutter AFD-200 - En curso')),
+              Center(child: Text('Dart Fundamentals - Completado ✅')),
+              Center(child: Text('No tienes cursos guardados')),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ---------- Sección 3: Perfil ----------
+class SeccionPerfil extends StatelessWidget {
+  const SeccionPerfil({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircleAvatar(radius: 40, child: Icon(Icons.person, size: 40)),
+          SizedBox(height: 12),
+          Text('Edison Andrés Forero Riaño', style: TextStyle(fontSize: 18)),
+        ],
+      ),
+    );
+  }
+}

@@ -1,0 +1,188 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const ReservaHotelApp());
+}
+
+class ReservaHotelApp extends StatelessWidget {
+  const ReservaHotelApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Reserva de Hotel',
+      theme: ThemeData(primarySwatch: Colors.purple),
+      home: const PantallaReserva(),
+    );
+  }
+}
+
+class PantallaReserva extends StatefulWidget {
+  const PantallaReserva({super.key});
+
+  @override
+  State<PantallaReserva> createState() => _PantallaReservaState();
+}
+
+class _PantallaReservaState extends State<PantallaReserva> {
+  // Controladores para leer lo que el usuario escribe
+  final controladorNombre = TextEditingController();
+  final controladorCorreo = TextEditingController();
+
+  DateTime? fechaEntrada;
+  int numeroHuespedes = 1;
+  bool incluyeDesayuno = false;
+  String tipoHabitacion = 'Sencilla';
+
+  final precios = {'Sencilla': 120000, 'Doble': 180000, 'Suite': 320000};
+
+  double get precioTotal {
+    double base = precios[tipoHabitacion]!.toDouble();
+    if (incluyeDesayuno) base += 25000 * numeroHuespedes;
+    return base;
+  }
+
+  // ---------- Selector de fecha ----------
+  Future<void> elegirFecha() async {
+    final fecha = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2027, 12, 31),
+    );
+    if (fecha != null) {
+      setState(() => fechaEntrada = fecha);
+    }
+  }
+
+  // ---------- Diálogo de confirmación ----------
+  void confirmarReserva() {
+    // Validación simple antes de mostrar el diálogo
+    if (controladorNombre.text.isEmpty || fechaEntrada == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Completa tu nombre y la fecha de entrada')),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Confirmar reserva'),
+        content: Text(
+          'Huésped: ${controladorNombre.text}\n'
+          'Habitación: $tipoHabitacion\n'
+          'Huéspedes: $numeroHuespedes\n'
+          'Fecha: ${fechaEntrada!.day}/${fechaEntrada!.month}/${fechaEntrada!.year}\n'
+          'Desayuno: ${incluyeDesayuno ? "Sí" : "No"}\n'
+          'Total: \$${precioTotal.toStringAsFixed(0)}',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context); // cierra el diálogo
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('¡Reserva confirmada! 🎉')),
+              );
+            },
+            child: const Text('Confirmar'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Reserva de Hotel')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: ListView(
+          children: [
+            TextField(
+              controller: controladorNombre,
+              decoration: const InputDecoration(
+                labelText: 'Nombre completo',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.person),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: controladorCorreo,
+              keyboardType: TextInputType.emailAddress,
+              decoration: const InputDecoration(
+                labelText: 'Correo electrónico',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.email),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // ---------- Tipo de habitación (Radio) ----------
+            const Text('Tipo de habitación', style: TextStyle(fontWeight: FontWeight.bold)),
+            ...precios.keys.map((tipo) => RadioListTile<String>(
+                  title: Text('$tipo - \$${precios[tipo]}'),
+                  value: tipo,
+                  groupValue: tipoHabitacion,
+                  onChanged: (valor) => setState(() => tipoHabitacion = valor!),
+                )),
+            const SizedBox(height: 8),
+
+            // ---------- Fecha ----------
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.calendar_today),
+              title: Text(fechaEntrada == null
+                  ? 'Elegir fecha de entrada'
+                  : 'Entrada: ${fechaEntrada!.day}/${fechaEntrada!.month}/${fechaEntrada!.year}'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: elegirFecha,
+            ),
+
+            // ---------- Slider de huéspedes ----------
+            Text('Número de huéspedes: $numeroHuespedes'),
+            Slider(
+              value: numeroHuespedes.toDouble(),
+              min: 1,
+              max: 6,
+              divisions: 5,
+              label: '$numeroHuespedes',
+              onChanged: (valor) => setState(() => numeroHuespedes = valor.toInt()),
+            ),
+
+            // ---------- Switch ----------
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: const Text('Incluir desayuno'),
+              subtitle: const Text('+\$25.000 por huésped'),
+              value: incluyeDesayuno,
+              onChanged: (valor) => setState(() => incluyeDesayuno = valor),
+            ),
+
+            const SizedBox(height: 16),
+            Text(
+              'Total estimado: \$${precioTotal.toStringAsFixed(0)}',
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: confirmarReserva,
+                style: ElevatedButton.styleFrom(padding: const EdgeInsets.all(16)),
+                child: const Text('Reservar', style: TextStyle(fontSize: 16)),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
