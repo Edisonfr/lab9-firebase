@@ -5,7 +5,7 @@ import '../modelos/solicitud.dart';
 import '../servicios/solicitudes_servicio.dart';
 // import 'detalle.dart'; // ETAPA 5: descomentar
 // import 'mapa.dart'; // ETAPA 6: descomentar
-// import 'nueva.dart'; // ETAPA 4: descomentar
+import 'nueva.dart';
 
 class PantallaLista extends StatelessWidget {
   const PantallaLista({super.key});
@@ -36,8 +36,7 @@ class PantallaLista extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          // ETAPA 4: descomentar la línea siguiente
-          // Navigator.push(context, MaterialPageRoute(builder: (_) => const PantallaNueva()));
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const PantallaNueva()));
         },
         icon: const Icon(Icons.add),
         label: const Text('Nueva'),
