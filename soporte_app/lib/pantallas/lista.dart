@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../modelos/solicitud.dart';
 import '../servicios/solicitudes_servicio.dart';
 import 'detalle.dart';
-// import 'mapa.dart'; // ETAPA 6: descomentar
+import 'mapa.dart';
 import 'nueva.dart';
 
 class PantallaLista extends StatelessWidget {
@@ -23,8 +23,7 @@ class PantallaLista extends StatelessWidget {
             icon: const Icon(Icons.map),
             tooltip: 'Mapa de atenciones',
             onPressed: () {
-              // ETAPA 6: descomentar la línea siguiente
-              // Navigator.push(context, MaterialPageRoute(builder: (_) => const PantallaMapa()));
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const PantallaMapa()));
             },
           ),
           IconButton(
