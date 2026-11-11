@@ -1,0 +1,18 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Cada usuario solo lee y escribe su propio perfil
+    match /usuarios/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // Cada usuario solo crea, lee y modifica sus propias solicitudes
+    match /solicitudes/{id} {
+      allow create: if request.auth != null
+                    && request.resource.data.creadoPor == request.auth.uid;
+      allow read, update, delete: if request.auth != null
+                    && resource.data.creadoPor == request.auth.uid;
+    }
+  }
+}
