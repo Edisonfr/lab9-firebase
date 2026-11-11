@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../modelos/solicitud.dart';
 import '../servicios/solicitudes_servicio.dart';
-// import 'detalle.dart'; // ETAPA 5: descomentar
+import 'detalle.dart';
 // import 'mapa.dart'; // ETAPA 6: descomentar
 import 'nueva.dart';
 
@@ -58,8 +58,7 @@ class PantallaLista extends StatelessWidget {
                   title: Text(s.titulo),
                   subtitle: Text('${s.prioridad.name} · ${s.estado.texto}'),
                   onTap: () {
-                    // ETAPA 5: descomentar la línea siguiente
-                    // Navigator.push(context, MaterialPageRoute(builder: (_) => PantallaDetalle(id: s.id)));
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => PantallaDetalle(id: s.id)));
                   },
                 ),
               );
